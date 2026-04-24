@@ -1,10 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary: #e31e24;
-  /* Rojo Bohío */
-  --primary-hover: #c4191f;
-  --primary-light: #fee2e2;
+  --primary: #2563eb; /* Azul Orion */
+  --primary-hover: #1d4ed8;
+  --primary-light: #dbeafe;
   --bg: #fdfdfd;
   --surface: #ffffff;
   --text: #111827;

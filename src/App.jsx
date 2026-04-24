@@ -3,7 +3,8 @@ import { Camera, Plus, Trash2, Printer, Home, FileText, Zap, Droplets, Flame, Ch
 import './App.css';
 import { supabase } from './supabase';
 
-const LOGO_URL = "https://i.postimg.cc/k47By9mJ/logo-bohio.jpg";
+const LOGO_URL = import.meta.env.VITE_APP_LOGO_URL || "https://i.postimg.cc/k47By9mJ/logo-bohio.jpg";
+const APP_NAME = import.meta.env.VITE_APP_NAME || "INVENTARIO DIGITAL ORION";
 
 const VoiceInput = ({ value, onChange, placeholder, type = 'text', rows = 4, className = '', min, style }) => {
   const [isListening, setIsListening] = useState(false);
@@ -88,7 +89,7 @@ const Auth = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              placeholder="admin@bohio.com"
+              placeholder={`admin@${APP_NAME.toLowerCase().split(' ')[0]}.com`}
               style={{ padding: '0.875rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}
             />
           </div>
@@ -113,7 +114,7 @@ const Auth = () => {
         <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>
             Acceso restringido. <br />
-            Inventario Digital Bohío © 2026
+            {APP_NAME} © 2026
           </p>
         </div>
       </div>
@@ -275,8 +276,8 @@ export default function App() {
       folderId: import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID,
       propiedad: data.propiedad || "Sin_Nombre",
       seccion: path,
-      filename: `foto_${Date.now()}.jpg`,
-      image: compressedBase64
+      fileName: `foto_${Date.now()}.jpg`,
+      base64: compressedBase64
     };
 
     console.log("🚀 Enviando a Google Drive...");
@@ -495,8 +496,8 @@ export default function App() {
     <div className="pdf-page">
       <div className="print-header">
         <h1>INVENTARIO INMUEBLE</h1>
-        <p style={{ fontWeight: '800', fontSize: '12pt', color: '#e31e24', marginBottom: '4px' }}>
-          BOHIO CONSULTORES INMOBILIARIOS SAS - NIT 900 479883-8
+        <p style={{ fontWeight: '800', fontSize: '12pt', color: 'var(--primary)', marginBottom: '4px' }}>
+          {APP_NAME} - GESTIÓN INMOBILIARIA
         </p>
         <p style={{ fontWeight: '700', fontSize: '10pt', letterSpacing: '2px', color: '#555' }}>
           ACTA ORIGINAL: {type === 'ARRENDADOR' ? 'PROPIETARIO' : 'ARRENDATARIO'}
@@ -624,7 +625,7 @@ export default function App() {
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ borderBottom: '2px solid #000', marginBottom: '8px', minHeight: '40px' }}></div>
-          <p style={{ fontSize: '8.5pt', fontWeight: '800' }}>INVENTARIO INMUEBLE, BOHIO CONSULTORES INMOBILIARIOS SAS NIT-900479883-8</p>
+          <p style={{ fontSize: '8.5pt', fontWeight: '800' }}>{APP_NAME} - SISTEMA DE GESTIÓN PROFESIONAL</p>
         </div>
       </div>
     </div>
@@ -699,7 +700,7 @@ export default function App() {
               <LogOut size={20} />
             </button>
             <div style={{ textAlign: 'center' }}>
-              <h1 style={{ color: 'var(--primary)', fontWeight: '800', letterSpacing: '-1px', margin: 0 }}>INVENTARIO DIGITAL BOHÍO <span style={{ fontSize: '0.8rem', verticalAlign: 'middle', background: '#e31e24', color: 'white', padding: '2px 8px', borderRadius: '4px' }}>V2</span></h1>
+              <h1 style={{ color: 'var(--primary)', fontWeight: '800', letterSpacing: '-1px', margin: 0 }}>{APP_NAME} <span style={{ fontSize: '0.8rem', verticalAlign: 'middle', background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: '4px' }}>V2</span></h1>
               <p style={{ color: 'var(--text-muted)' }}>Capture y Gestión Profesional</p>
             </div>
           </header>
