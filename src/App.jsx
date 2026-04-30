@@ -226,7 +226,7 @@ export default function App() {
   const fetchProperties = async () => {
     const { data: props, error } = await supabase
       .from('propiedades')
-      .select('*')
+      .select('id, nombre, direccion, contrato, tipo_inmueble, telefono, created_at')
       .order('created_at', { ascending: false });
     if (error) console.error('Error fetching:', error);
     else setSavedProperties(props);
@@ -421,9 +421,21 @@ export default function App() {
     }
   };
 
-  const loadProperty = (prop) => {
-    setData(prop.data);
-    setActivePropertyId(prop.id);
+  const loadProperty = async (propMeta) => {
+    // Al hacer clic, descargamos solo los datos de esta propiedad para no saturar la red
+    const { data: fullProp, error } = await supabase
+      .from('propiedades')
+      .select('*')
+      .eq('id', propMeta.id)
+      .single();
+      
+    if (error || !fullProp) {
+      alert("Error al cargar la propiedad: " + (error?.message || ""));
+      return;
+    }
+    
+    setData(fullProp.data);
+    setActivePropertyId(fullProp.id);
     setActiveSpaceId(null);
     setExpandedMeter(null);
   };
