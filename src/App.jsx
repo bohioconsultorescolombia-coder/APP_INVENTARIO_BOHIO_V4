@@ -762,7 +762,7 @@ export default function App() {
             <select
               value={activePropertyId || ""}
               onChange={(e) => {
-                const prop = savedProperties.find(p => p.id === e.target.value);
+                const prop = savedProperties.find(p => p.id.toString() === e.target.value);
                 if (prop) loadProperty(prop);
                 else createNew();
               }}
