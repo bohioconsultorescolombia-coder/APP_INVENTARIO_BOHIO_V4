@@ -269,31 +269,66 @@ export default function App() {
       });
     }
 
-    // Comprimir antes de enviar si es necesario
+    // Comprimir antes de enviar
     const compressedBase64 = await compressImage(base64);
 
-    const payload = {
-      folderId: import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID,
-      propiedad: data.propiedad || "Sin_Nombre",
-      seccion: path,
-      fileName: `foto_${Date.now()}.jpg`,
-      base64: compressedBase64
-    };
-
-    console.log("🚀 Enviando a Google Drive...");
+    // --- NUEVO CÓDIGO SUPABASE STORAGE ---
+    console.log("🚀 Subiendo a Supabase Storage...");
+    
+    // Convertir Base64 a Blob para subir a Supabase
+    const response = await fetch(compressedBase64);
+    const blob = await response.blob();
+    
+    // Nombre único para evitar sobreescribir y ruta por propiedad
+    const fileName = `foto_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+    const propiedadLimpia = (data.propiedad || "Sin_Nombre").replace(/[^a-zA-Z0-9_-]/g, "_");
+    const filePath = `${propiedadLimpia}/${path}/${fileName}`;
 
     try {
-      await fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
+      // 1. Subir a Supabase Storage (Bucket 'ORION')
+      const { error: uploadError } = await supabase
+        .storage
+        .from('ORION')
+        .upload(filePath, blob, {
+          contentType: 'image/jpeg',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // 2. Obtener URL Pública
+      const { data: publicUrlData } = supabase
+        .storage
+        .from('ORION')
+        .getPublicUrl(filePath);
+
+      const supabaseUrl = publicUrlData.publicUrl;
+      console.log("✅ Imagen subida a Supabase:", supabaseUrl);
+
+      // --- MANTENER ENVÍO A GOOGLE DRIVE EN SEGUNDO PLANO (OPCIONAL) ---
+      const payload = {
+        folderId: import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID,
+        propiedad: data.propiedad || "Sin_Nombre",
+        seccion: path,
+        fileName: fileName,
+        base64: compressedBase64
+      };
+
+      fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
-      });
-    } catch (e) {
-      console.warn("Fallo sincronización individual:", e);
-    }
+      }).catch(e => console.warn("Fallo sincronización individual con Google Drive:", e));
 
-    return compressedBase64;
+      // ‼️ CRÍTICO: DEVOLVEMOS LA URL PÚBLICA, NO EL TEXTO BASE64 ‼️
+      return supabaseUrl;
+
+    } catch (error) {
+      console.error("Error al subir a Supabase Storage:", error);
+      alert("Error subiendo foto a Supabase: " + error.message);
+      throw error;
+    }
   };
 
   const handleProcessImage = async (fileOrUrl, path, callback) => {
