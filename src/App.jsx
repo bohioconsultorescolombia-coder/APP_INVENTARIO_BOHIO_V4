@@ -305,21 +305,26 @@ export default function App() {
       const supabaseUrl = publicUrlData.publicUrl;
       console.log("✅ Imagen subida a Supabase:", supabaseUrl);
 
-      // --- MANTENER ENVÍO A GOOGLE DRIVE EN SEGUNDO PLANO (OPCIONAL) ---
+      // --- MANTENER ENVÍO A GOOGLE DRIVE ---
       const payload = {
         folderId: import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID,
         propiedad: data.propiedad || "Sin_Nombre",
         seccion: path,
-        fileName: fileName,
+        fileName: `foto_${Date.now()}.jpg`,
         base64: compressedBase64
       };
 
-      fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload)
-      }).catch(e => console.warn("Fallo sincronización individual con Google Drive:", e));
+      console.log("🚀 Enviando a Google Drive...");
+      try {
+        await fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn("Fallo sincronización individual con Google Drive:", e);
+      }
 
       // ‼️ CRÍTICO: DEVOLVEMOS LA URL PÚBLICA, NO EL TEXTO BASE64 ‼️
       return supabaseUrl;
