@@ -4,7 +4,7 @@ import './App.css';
 import { supabase } from './supabase';
 
 const LOGO_URL = import.meta.env.VITE_APP_LOGO_URL || "https://i.postimg.cc/k47By9mJ/logo-bohio.jpg";
-const APP_NAME = import.meta.env.VITE_APP_NAME || "INVENTARIO DIGITAL ORION";
+const APP_NAME = import.meta.env.VITE_APP_NAME || "INVENTARIO DIGITAL";
 
 const VoiceInput = ({ value, onChange, placeholder, type = 'text', rows = 4, className = '', min, style }) => {
   const [isListening, setIsListening] = useState(false);
@@ -549,7 +549,7 @@ export default function App() {
       <div className="print-header">
         <h1>INVENTARIO INMUEBLE</h1>
         <p style={{ fontWeight: '800', fontSize: '12pt', color: 'var(--primary)', marginBottom: '4px' }}>
-          {APP_NAME} - GESTIÓN INMOBILIARIA
+          {APP_NAME} - {import.meta.env.VITE_APP_NIT || "NIT 000.000.000-0"}
         </p>
         <p style={{ fontWeight: '700', fontSize: '10pt', letterSpacing: '2px', color: '#555' }}>
           ACTA ORIGINAL: {type === 'ARRENDADOR' ? 'PROPIETARIO' : 'ARRENDATARIO'}
