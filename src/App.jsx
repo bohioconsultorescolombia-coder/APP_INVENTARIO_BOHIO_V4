@@ -177,6 +177,14 @@ const CameraModal = ({ onCapture, onClose }) => {
   );
 };
 
+const sanitizePathSegment = (str, fallback = 'Sin_Nombre') => {
+  if (!str) return fallback;
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]/g, "_");
+};
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [cameraConfig, setCameraConfig] = useState(null);
@@ -281,8 +289,9 @@ export default function App() {
     
     // Nombre único para evitar sobreescribir y ruta por propiedad
     const fileName = `foto_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
-    const propiedadLimpia = (data.propiedad || "Sin_Nombre").replace(/[^a-zA-Z0-9_-]/g, "_");
-    const filePath = `${propiedadLimpia}/${path}/${fileName}`;
+    const propiedadLimpia = sanitizePathSegment(data.propiedad, "Sin_Nombre");
+    const pathLimpio = sanitizePathSegment(path, "Sin_Seccion");
+    const filePath = `${propiedadLimpia}/${pathLimpio}/${fileName}`;
 
     try {
       // 1. Subir a Supabase Storage (Bucket 'ORION')
@@ -319,7 +328,6 @@ export default function App() {
         await fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
           body: JSON.stringify(payload)
         });
       } catch (e) {
@@ -403,7 +411,6 @@ export default function App() {
       await fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({
           action: "save_data",
           folderId: import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID,
